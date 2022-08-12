@@ -1,0 +1,187 @@
+{% extends 'layouts/main.html' %}
+{% block title %}{{ data.artist.name }} | Artist{% endblock %}
+{% block content %}
+<div class="row">
+	{% with errors = get_flashed_messages(category_filter=["error"]) %}
+	{% if errors %}
+	<div class="alert alert-success alert-dismissible d-flex fade show" style="background-color:#ff967f" role="alert">
+		<svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img"
+			aria-label="Success:">
+			<use xlink:href="#exclamation-triangle-fill" />
+		</svg>
+		<div class="ml-2">
+			{%- for msg in errors %}
+			<li>{{ msg }}</li>
+			{% endfor -%}
+
+		</div>
+		<button type="button" class="close" data-dismiss="alert"
+			aria-label="Close">
+			<span aria-hidden="true">&times;</span>
+		</button>
+	</div> 
+	{% endif %}
+	{% endwith %}
+
+	{% with messages = get_flashed_messages() %}
+	{% if messages %}
+	<div class="alert alert-success alert-dismissible d-flex fade show" style="background-color: aquamarine" role="alert">
+		<svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img"
+			aria-label="Success:">
+			<use xlink:href="#exclamation-triangle-fill" />
+		</svg>
+		<div class="ml-2">
+			{% for message in messages %}
+			{{ message }}
+			{% endfor %}
+
+		</div>
+		<button type="button" class="close" data-dismiss="alert"
+			aria-label="Close">
+			<span aria-hidden="true">&times;</span>
+		</button>
+	</div> 
+	
+	{% endif %}
+	{% endwith %}
+	<div class="col-sm-6">
+		<h1 class="monospace">
+			{{ data.artist.name }}
+		</h1>
+		<p class="subtitle">
+			ID: {{ data.artist.id }}
+		</p>
+		<div class="genres">
+			{% for genre in data.genres %}
+			<span class="genre">{{ genre }}</span>
+			{% endfor %}
+		</div>
+		<p>
+			<i class="fas fa-globe-americas"></i> {{ data.artist.artistCityAndState.city }}, {{ data.artist.artistCityAndState.state }}
+		</p>
+		<p>
+			<i class="fas fa-phone-alt"></i> {% if data.artist.phone %}{{ data.artist.phone }}{% else %}No Phone{% endif %}
+        </p>
+        <p>
+			<i class="fas fa-link"></i> {% if data.artist.website %}<a href="{{ data.artist.website }}" target="_blank">{{ data.artist.website }}</a>{% else %}No Website{% endif %}
+		</p>
+		<p>
+			<i class="fab fa-facebook-f"></i> {% if data.artist.facebook_link %}<a href="{{ data.artist.facebook_link }}" target="_blank">{{ data.artist.facebook_link }}</a>{% else %}No Facebook Link{% endif %}
+        </p>
+		
+		{% if data.artist.seeking_venue %}
+		<div class="seeking">
+			<p class="lead">Currently seeking performance venues</p>
+			<div class="description">
+				<i class="fas fa-quote-left"></i> {{ data.artist.seeking_description }} <i class="fas fa-quote-right"></i>
+			</div>
+		</div>
+		{% else %}	
+		<p class="not-seeking">
+			<i class="fas fa-moon"></i> Not currently seeking performance venues
+		</p>
+		{% endif %}
+
+		<div class="row">
+			<div class="column">
+				<p class="lead">Available Days</p>
+				{% if data.available_days%}
+				<ul  class="items">
+					{% for day in data.available_days %}
+					<li>
+						
+							
+							<div class="item">
+								<h5>{{ day.date_available.strftime("%m/%d/%Y, %H:%M:%S")|datetime('full') }}</h5>
+							</div>
+					
+					</li>
+					{% endfor %}
+				
+				</ul>
+				{%else%}
+
+				<h5 style="color: red;">No Available times added. Defaultly You can't be booked for shows.</h5>
+
+				{%endif%}
+			</div>
+		</div>
+		
+		<div style="margin-top: 15px">
+			<button href="#" data-toggle="modal" data-target="#availabilty" class="btn btn-primary btn-lg">Add Available Date/Time</button></a>
+		</div>
+		
+		
+	</div>
+
+	<div class="col-sm-6">
+		<img src="{{ data.artist.image_link }}" alt="Artist Image" />
+	</div>
+</div>
+<section>
+	<h2 class="monospace">{{ data.upcoming_shows_count }} Upcoming {% if data.upcoming_shows_count == 1 %}Show{% else %}Shows{% endif %}</h2>
+	<div class="row">
+		{%for show in data.upcoming_shows %}
+		<div class="col-sm-4">
+			<div class="tile tile-show">
+				<img src="{{ show.venueshows.image_link }}" alt="Show Venue Image" />
+				<h5><a href="/venues/{{ show.venueshows.id }}">{{ show.venueshows.name }}</a></h5>
+				<h6>{{ show.start_time.strftime("%m/%d/%Y, %H:%M:%S")|datetime('full') }}</h6>
+			</div>
+		</div>
+		{% endfor %}
+	</div>
+</section>
+<section>
+	<h2 class="monospace">{{ data.past_shows_count }} Past {% if data.past_shows_count == 1 %}Show{% else %}Shows{% endif %}</h2>
+	<div class="row">
+		{%for show in data.past_shows %}
+		<div class="col-sm-4">
+			<div class="tile tile-show">
+				<img src="{{ show.venueshows.image_link  }}" alt="Show Venue Image" />
+				<h5><a href="/venues/{{ show.venueshows.id }}">{{ show.venueshows.name }}</a></h5>
+				<h6>{{ show.start_time.strftime("%m/%d/%Y, %H:%M:%S")|datetime('full') }}</h6>
+			</div>
+		</div>
+		{% endfor %}
+	</div>
+</section>
+
+<a href="/artists/{{ data.artist.id }}/edit"><button class="btn btn-primary btn-lg">Edit</button></a>
+
+  <!-- Logout Modal-->
+<div class="modal fade" id="availabilty" tabindex="-1" role="dialog" aria-labelledby="modal"
+  aria-hidden="true">
+  <div class="modal-dialog" role="document">
+	  <div class="modal-content">
+		  <div class="modal-header">
+			  <h5 class="modal-title" id="modal">Please enter the day you will be available for booking</h5>
+			  <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+				  <span aria-hidden="true">×</span>
+			  </button>
+		  </div>
+		  <div class="modal-body">
+			<form class="form" method="post" action="/artist_availabilty/add/{{data.artist.id}}">
+				
+				<div class="form-group">
+				  <label for="available_date">Enter Your Available Date</label>
+				  {{ form.available_date(class_ = 'form-control', placeholder='YYYY-MM-DD', autofocus = true )}}
+				</div>
+				  <button class="btn btn-primary" type="submit" >Add</button>
+			 
+			</form>
+			
+		  </div>
+
+		 
+		  <div class="modal-footer">
+			  
+			  
+		  </div>
+	  </div>
+  </div>
+</div>
+
+{% endblock %}
+
+

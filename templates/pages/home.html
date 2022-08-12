@@ -1,0 +1,102 @@
+{% extends 'layouts/main.html' %}
+{% block title %}Fyyur{% endblock %}
+{% block content %}
+<div class="row">
+	<div class="col-sm-6">
+		{% with errors = get_flashed_messages(category_filter=["error"]) %}
+		{% if errors %}
+		<div class="alert alert-success alert-dismissible d-flex fade show" style="background-color:#ff967f" role="alert">
+			<svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img"
+				aria-label="Success:">
+				<use xlink:href="#exclamation-triangle-fill" />
+			</svg>
+			<div class="ml-2">
+				{%- for msg in errors %}
+				<li>{{ msg }}</li>
+				{% endfor -%}
+
+			</div>
+			<button type="button" class="close" data-dismiss="alert"
+				aria-label="Close">
+				<span aria-hidden="true">&times;</span>
+			</button>
+		</div> 
+		{% endif %}
+		{% endwith %}
+
+		{% with messages = get_flashed_messages() %}
+		{% if messages %}
+		<div class="alert alert-success alert-dismissible d-flex fade show" style="background-color: aquamarine" role="alert">
+			<svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img"
+				aria-label="Success:">
+				<use xlink:href="#exclamation-triangle-fill" />
+			</svg>
+			<div class="ml-2">
+				{% for message in messages %}
+				{{ message }}
+				{% endfor %}
+
+			</div>
+			<button type="button" class="close" data-dismiss="alert"
+				aria-label="Close">
+				<span aria-hidden="true">&times;</span>
+			</button>
+		</div> 
+		
+		{% endif %}
+		{% endwith %}
+		<h1>Fyyur 🔥</h1>
+		<p class="lead">Where musical artists meet musical venues.</p>
+		<h3>
+			<a href="/venues"><button class="btn btn-primary btn-lg">Find a venue</button></a>
+			<a href="/venues/create"><button class="btn btn-default btn-lg">Post a venue</button></a>
+		</h3>
+		<h3>
+			<a href="/artists"><button class="btn btn-primary btn-lg">Find an artist</button></a>
+			<a href="/artists/create"><button class="btn btn-default btn-lg">Post an artist</button></a>
+		</h3>
+		<p class="lead">Publicize about your show for free.</p>
+		<h3>
+			<a href="/shows/create"><button class="btn btn-default btn-lg">Post a show</button></a>
+		</h3>
+		
+	    <div class="row">
+			<div class="column">
+				<p class="lead">Recent Listed  Artists</p>
+				<ul  class="items">
+					{% for artist in data.recent_artists %}
+					<li>
+						<a href="/artists/{{ artist.id }}">
+							<i class="fas fa-users"></i>
+							<div class="item">
+								<h5>{{ artist.name }}</h5>
+							</div>
+						</a>
+					</li>
+					{% endfor %}
+				</ul>
+			</div>
+			<div class="column">
+				<p class="lead">Recent Listed Venues</p>
+				<ul class="items">
+					{% for venue in data.recent_venues %}
+					<li>
+						<a href="/venues/{{ venue.id }}">
+							<i class="fas fa-music"></i>
+							<div class="item">
+								<h5>{{ venue.name }}</h5>
+							</div>
+						</a>
+					</li>
+					{% endfor %}
+				</ul>
+			</div>
+		</div>
+			
+
+	</div>
+	<div class="col-sm-6 hidden-sm hidden-xs">
+		<img id="front-splash" src="{{ url_for('static',filename='img/front-splash.jpg') }}" alt="Front Photo of Musical Band" />
+	</div>
+</div>
+{% endblock %}
