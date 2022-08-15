@@ -147,7 +147,17 @@
 	</div>
 </section>
 
-<a href="/artists/{{ data.artist.id }}/edit"><button class="btn btn-primary btn-lg">Edit</button></a>
+<div class="row">
+	<div class="column">
+		<a href="/artists/{{ data.artist.id }}/edit"><button class="btn btn-primary btn-lg">Edit</button></a>
+	</div>
+	<div class="column">
+		<a href="/artists/delete/{{ data.artist.id }}"><button class="btn btn-danger btn-lg">Delete</button></a>
+	</div>
+
+
+</div>
+
 
   <!-- Logout Modal-->
 <div class="modal fade" id="availabilty" tabindex="-1" role="dialog" aria-labelledby="modal"

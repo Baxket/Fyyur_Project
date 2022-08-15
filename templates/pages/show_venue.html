@@ -75,7 +75,17 @@
 	</div>
 </section>
 
-<a href="/venues/{{ data.venue.id }}/edit"><button class="btn btn-primary btn-lg">Edit</button></a>
+<div class="row">
+	<div class="column">
+		<a href="/venues/{{ data.venue.id }}/edit"><button class="btn btn-primary btn-lg">Edit</button></a>
+	</div>
+	<div class="column">
+		<a href="/venues/delete/{{ data.venue.id }}"><button class="btn btn-danger btn-lg">Delete</button></a>
+	</div>
+
+
+</div>
+
 
 {% endblock %}
 

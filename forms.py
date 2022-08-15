@@ -1,6 +1,7 @@
 from datetime import datetime, date
+from email.policy import default
 from flask_wtf import Form
-from wtforms import StringField, SelectField, SelectMultipleField, DateTimeField, BooleanField
+from wtforms import StringField,IntegerField, SelectField, SelectMultipleField, DateTimeField, BooleanField, validators
 from wtforms.validators import DataRequired, AnyOf, URL, InputRequired
 
 class ShowForm(Form):
@@ -82,8 +83,8 @@ class VenueForm(Form):
     address = StringField(
         'address', validators=[DataRequired()]
     )
-    phone = StringField(
-        'phone'
+    phone = IntegerField(
+        'phone', validators=[DataRequired(),validators.Length(min=10, max=16)]
     )
     image_link = StringField(
         'image_link'
