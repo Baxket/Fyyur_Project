@@ -195,9 +195,9 @@ class ArtistForm(Form):
        
 
     )
-    phone = StringField(
+    phone = IntegerField(
         # TODO implement validation logic for state
-        'phone'
+        'phone', validators=[DataRequired(),validators.Length(min=10, max=16)]
     )
     image_link = StringField(
         'image_link'
