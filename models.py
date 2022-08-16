@@ -15,14 +15,7 @@ migrate = Migrate(app,db)
 #----------------------------------------------------------------------------#
 # Models.
 #----------------------------------------------------------------------------#
-# show = db.Table('show',
-#     db.Column('artist_id', db.Integer, db.ForeignKey('Artist.id'), primary_key=True),
-#     db.Column('venue_id', db.Integer, db.ForeignKey('Venue.id'), primary_key=True),
-#     db.Column('start_time', db.DateTime, nullable = False),
-#     db.Column('created_at', db.DateTime, nullable = False),
-#     db.Column('updated_at', db.DateTime, nullable = True)
 
-# )
 
 class Show(db.Model):
   __tablename__ = 'Show'
