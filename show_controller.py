@@ -45,7 +45,7 @@ def create_show_submission():
          if date_time > today:
 
            if check_if_available_date:
-             check_if_available_time = Artist_Available_Days.query.filter_by(artist_id =artist_id).filter(Artist_Available_Days.date_available < start_time ).first()
+             check_if_available_time = Artist_Available_Days.query.filter_by(artist_id =artist_id).filter(Artist_Available_Days.date_available <= start_time ).first()
              if check_if_available_time:
                created_at = datetime.today()
                show = Show(artist_id = artist_id, venue_id = venue_id, start_time =start_time, created_at = created_at)
@@ -54,9 +54,9 @@ def create_show_submission():
                db.session.commit()
                flash('Show was successfully listed!')
              else:
-               flash('Sorry Artist is availble on this date but not around this time. Check Artist Page for more details!')
+               flash('Sorry This Artist is available on this date but not around this time. Check the Artist Page for more details!')
            else:
-             flash('Sorry Artist is not Availble on this date. Check Artist Page for more details!')
+             flash('Sorry This Artist is not Available on this date. Check Artist Page for more details!')
          else:
           
            flash('Sorry, the time you entered is past')

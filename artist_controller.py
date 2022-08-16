@@ -4,6 +4,7 @@ import sys
 from datetime import datetime
 from sqlalchemy.sql import func, or_
 from models import *
+from asyncio.windows_events import NULL
 #  Create Artist
 #  ----------------------------------------------------------------
 
@@ -14,47 +15,50 @@ def create_artist_form():
 
 @app.route('/artists/create', methods=['POST'])
 def create_artist_submission():
-  try:
-    name = request.form['name']
-    city = request.form['city']
-    state = request.form['state']
-    phone = request.form['phone']
-    genres = request.form.getlist('genres')
-    facebook_link = request.form['facebook_link']
-    image_link = request.form['image_link']
-    website_link = request.form['website_link']
-    seeking_venue = request.form.get('seeking_venue',type=bool)
-    seeking_description = request.form['seeking_description']
-    exists = db.session.query(City_and_State_Artist.id).filter_by(city=city, state = state).first()
-
-   
-    if not exists:
-      city_and_state_artist = City_and_State_Artist(city=city,state=state)
-      db.session.add(city_and_state_artist)
-      db.session.commit()
-    Id =  City_and_State_Artist.query.filter_by(city=city, state = state).first()
-    artist = Artist(
-    name=name,
-    phone=phone,
-    genres=genres,
-    image_link=image_link,
-    facebook_link=facebook_link,   
-    Website_link=website_link,
-    S_Description=seeking_description,
-    seeking_venue=seeking_venue,
-    city_state_id=Id.id,
-    created_at = datetime.now())
-    db.session.add(artist)
-    db.session.commit() 
-    flash('Artist ' + request.form['name'] + ' was successfully listed!')
-
-  except:
-    db.session.rollback()
-    flash(sys.exc_info(), 'error')
-  finally:
-    recent_artists = Artist.query.order_by(Artist.created_at).limit(10).all()
-    recent_venues = Venue.query.order_by(Venue.created_at).limit(10).all()
-    data = {"recent_artists":recent_artists,"recent_venues":recent_venues}
+  form = ArtistForm(request.form)
+  name = request.form['name']
+  city = request.form['city']
+  state = request.form['state']
+  phone = request.form['phone']
+  genres = request.form.getlist('genres')
+  facebook_link = request.form['facebook_link']
+  image_link = request.form['image_link']
+  website_link = request.form['website_link']
+  seeking_venue = request.form.get('seeking_venue',type=bool)
+  seeking_description = request.form['seeking_description']
+  if form.validate():
+   try:
+     
+     exists = db.session.query(City_and_State_Artist.id).filter_by(city=city, state = state).first()
+  
+    
+     if not exists:
+       city_and_state_artist = City_and_State_Artist(city=city,state=state)
+       db.session.add(city_and_state_artist)
+       db.session.commit()
+     Id =  City_and_State_Artist.query.filter_by(city=city, state = state).first()
+     artist = Artist(
+     name=name,
+     phone=phone,
+     genres=genres,
+     image_link=image_link,
+     facebook_link=facebook_link,   
+     Website_link=website_link,
+     S_Description=seeking_description,
+     seeking_venue=seeking_venue,
+     city_state_id=Id.id,
+     created_at = datetime.now())
+     db.session.add(artist)
+     db.session.commit() 
+     flash('Artist ' + request.form['name'] + ' was successfully listed!')
+  
+   except:
+     db.session.rollback()
+     flash(sys.exc_info(), 'error')
+   finally:
+     recent_artists = Artist.query.order_by(Artist.created_at).limit(10).all()
+     recent_venues = Venue.query.order_by(Venue.created_at).limit(10).all()
+     data = {"recent_artists":recent_artists,"recent_venues":recent_venues}
    # called upon submitting the new artist listing form
    # TODO: insert form data as a new Venue record in the db, instead
    # TODO: modify data to be the data object returned from db insertion
@@ -63,7 +67,23 @@ def create_artist_submission():
 
   # TODO: on unsuccessful db insert, flash an error instead.
   # e.g., flash('An error occurred. Artist ' + data.name + ' could not be listed.')
-    return render_template('pages/home.html', data =data)
+     return render_template('pages/home.html', data =data)
+  else:
+    form = ArtistForm()
+    form.name.data = name
+    form.city.data = city
+    form.state.data = state
+    form.phone.data = phone
+    form.genres.data = [genre for genre in genres]
+    form.facebook_link.data = facebook_link
+    form.image_link.data = image_link
+    form.website_link.data = website_link
+    form.seeking_venue.data = seeking_venue
+    form.seeking_description.data = seeking_description
+    
+    flash('Error !Type in right inputs especially for the Name and Phone or links. Notice! Name must not include symbols', 'error')
+    return render_template('forms/new_artist.html', form=form)
+  
 
 
 #  Update
@@ -87,41 +107,48 @@ def edit_artist(artist_id):
 
 @app.route('/artists/<int:artist_id>/edit', methods=['POST'])
 def edit_artist_submission(artist_id):
-  try:
-    
-    artist = Artist.query.get(artist_id)
-    
-    artist.name = request.form['name']
-    artist.genres = request.form.getlist('genres')
-    city=request.form['city']
-    state=request.form['state']
-    exists = db.session.query(City_and_State_Artist.id).filter_by(city=city, state = state).first()
+  form = ArtistForm(request.form)
+  if form.validate():
 
-   
-    if not exists:
-      city_and_state_artist = City_and_State_Artist(city=city,state=state)
+    try:
       
-      db.session.add(city_and_state_artist)
+      artist = Artist.query.get(artist_id)
+      
+      artist.name = request.form['name']
+      artist.genres = request.form.getlist('genres')
+      city=request.form['city']
+      state=request.form['state']
+      exists = db.session.query(City_and_State_Artist.id).filter_by(city=city, state = state).first()
+
+     
+      if not exists:
+        city_and_state_artist = City_and_State_Artist(city=city,state=state)
+        
+        db.session.add(city_and_state_artist)
+        db.session.commit()
+      Id =  City_and_State_Artist.query.filter_by(city=city, state = state).with_entities(City_and_State_Artist.id)
+      artist.city_state_id = Id
+      artist.phone = request.form['phone']
+      artist.Website_link = request.form['website_link']
+      artist.facebook_link = request.form['facebook_link']
+      artist.seeking_venue = request.form.get('seeking_venue',type=bool)
+      artist.S_Description = request.form['seeking_description']
+      artist.image_link = request.form['image_link']
+      artist.update_at = datetime.now()
+     
       db.session.commit()
-    Id =  City_and_State_Artist.query.filter_by(city=city, state = state).with_entities(City_and_State_Artist.id)
-    artist.city_state_id = Id
-    artist.phone = request.form['phone']
-    artist.Website_link = request.form['website_link']
-    artist.facebook_link = request.form['facebook_link']
-    artist.seeking_venue = request.form.get('seeking_venue',type=bool, default=False)
-    artist.S_description = request.form['seeking_description']
-    artist.image_link = request.form['image_link']
-    artist.update_at = datetime.now()
-   
-    db.session.commit()
-    flash('Astist ' + request.form['name'] + ' was successfully updated!')
-  except:
-    db.session.rollback()
-    flash(sys.exc_info(), 'error')
-  finally:
-  # TODO: take values from the form submitted, and update existing
-  # artist record with ID <artist_id> using the new attributes
-    return redirect(url_for('show_artist', artist_id=artist_id))
+      flash('Astist ' + request.form['name'] + ' was successfully updated!')
+    except:
+      db.session.rollback()
+      flash(sys.exc_info(), 'error')
+    finally:
+    # TODO: take values from the form submitted, and update existing
+    # artist record with ID <artist_id> using the new attributes
+      return redirect(url_for('show_artist', artist_id=artist_id))
+  else:
+    flash('Error !Type in right inputs especially for the Name and Phone or links, Notice! Name must not include symbols', 'error')
+    return redirect(url_for('edit_artist', artist_id=artist_id))
+
     
 
 #  Artists

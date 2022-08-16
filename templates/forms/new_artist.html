@@ -2,7 +2,16 @@
 {% block title %}New Artist{% endblock %}
 {% block content %}
   <div class="form-wrapper">
+    {% for field, errors in form.errors.items() %}
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        {{ ', '.join(errors) }}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    {% endfor %}
     <form method="post" class="form">
+  
       <h3 class="form-heading">List a new artist</h3>
       <div class="form-group">
         <label for="name">Name</label>
